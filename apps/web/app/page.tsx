@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useAccount, useConnect, useDisconnect } from "wagmi";
 
 import { normalizeAddress } from "../lib/address";
+import { formatPercent, formatUsd } from "../../../packages/shared/src";
 
 const protocolCards = [
   {
@@ -100,17 +101,17 @@ export default function HomePage() {
       <section className="summary-grid">
         <article className="summary-card">
           <span>Total portfolio value</span>
-          <strong>$0.00</strong>
+          <strong>{formatUsd(0)}</strong>
           <p>Aggregated across supported Base protocols.</p>
         </article>
         <article className="summary-card">
           <span>Unclaimed rewards</span>
-          <strong>$0.00</strong>
+          <strong>{formatUsd(0)}</strong>
           <p>Claimable incentives and emissions.</p>
         </article>
         <article className="summary-card">
           <span>Average net APY</span>
-          <strong>--</strong>
+          <strong>{formatPercent(null)}</strong>
           <p>Base yield plus rewards, separated by source.</p>
         </article>
       </section>
@@ -130,8 +131,8 @@ export default function HomePage() {
                 </div>
                 <p>{protocol.summary}</p>
                 <div className="protocol-metrics">
-                  <span>$0.00 supplied</span>
-                  <span>$0.00 borrowed</span>
+                  <span>{formatUsd(0)} supplied</span>
+                  <span>{formatUsd(0)} borrowed</span>
                 </div>
               </div>
             ))}
