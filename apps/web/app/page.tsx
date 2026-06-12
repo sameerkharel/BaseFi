@@ -5,6 +5,7 @@ import { useAccount, useConnect, useDisconnect } from "wagmi";
 
 import { normalizeAddress } from "../lib/address";
 import { formatPercent, formatUsd } from "../../../packages/shared/src";
+import { getYieldComparisonRows } from "../../../packages/shared/src";
 import { usePortfolioSnapshot } from "../lib/portfolio";
 
 const protocolCards = [
@@ -24,6 +25,8 @@ const protocolCards = [
     summary: "Liquidity and gauge rewards",
   },
 ];
+
+const comparisonAssets = ["USDC", "ETH"];
 
 export default function HomePage() {
   const { address, isConnected } = useAccount();
@@ -155,18 +158,24 @@ export default function HomePage() {
             <span>Idle capital opportunities</span>
           </div>
           <div className="comparison-table">
-            <div>
-              <strong>USDC</strong>
-              <span>Aave: --</span>
-              <span>Moonwell: --</span>
-              <span>Morpho: --</span>
-            </div>
-            <div>
-              <strong>ETH</strong>
-              <span>Aave: --</span>
-              <span>Moonwell: --</span>
-              <span>Aerodrome: --</span>
-            </div>
+            {comparisonAssets.map((assetSymbol) => {
+              const rows = getYieldComparisonRows(portfolio?.yields ?? [], assetSymbol);
+
+              return (
+                <div key={assetSymbol}>
+                  <strong>{assetSymbol}</strong>
+                  {rows.length > 0 ? (
+                    rows.map((row) => (
+                      <span key={row.protocolName}>
+                        {row.protocolName}: {formatPercent(row.totalApy)}
+                      </span>
+                    ))
+                  ) : (
+                    <span>No APY data available yet.</span>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </article>
       </section>
