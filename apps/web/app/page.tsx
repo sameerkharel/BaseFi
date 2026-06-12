@@ -5,6 +5,7 @@ import { useAccount, useConnect, useDisconnect } from "wagmi";
 
 import { normalizeAddress } from "../lib/address";
 import { formatPercent, formatUsd } from "../../../packages/shared/src";
+import { usePortfolioSnapshot } from "../lib/portfolio";
 
 const protocolCards = [
   {
@@ -32,6 +33,7 @@ export default function HomePage() {
   const [watchedAddress, setWatchedAddress] = useState<string | null>(null);
 
   const activeAddress = address ?? watchedAddress;
+  const { data: portfolio } = usePortfolioSnapshot(activeAddress ?? undefined);
 
   function applyWatchAddress() {
     const normalized = normalizeAddress(watchInput);
@@ -101,17 +103,17 @@ export default function HomePage() {
       <section className="summary-grid">
         <article className="summary-card">
           <span>Total portfolio value</span>
-          <strong>{formatUsd(0)}</strong>
+          <strong>{formatUsd(portfolio?.totalUsdValue ?? 0)}</strong>
           <p>Aggregated across supported Base protocols.</p>
         </article>
         <article className="summary-card">
           <span>Unclaimed rewards</span>
-          <strong>{formatUsd(0)}</strong>
+          <strong>{formatUsd(portfolio?.totalRewardsUsd ?? 0)}</strong>
           <p>Claimable incentives and emissions.</p>
         </article>
         <article className="summary-card">
           <span>Average net APY</span>
-          <strong>{formatPercent(null)}</strong>
+          <strong>{formatPercent(portfolio?.yields[0]?.supplyApy ?? null)}</strong>
           <p>Base yield plus rewards, separated by source.</p>
         </article>
       </section>
@@ -131,8 +133,16 @@ export default function HomePage() {
                 </div>
                 <p>{protocol.summary}</p>
                 <div className="protocol-metrics">
-                  <span>{formatUsd(0)} supplied</span>
-                  <span>{formatUsd(0)} borrowed</span>
+                  <span>{formatUsd(
+                    portfolio?.positions
+                      .filter((position) => position.protocolName === protocol.name)
+                      .reduce((runningTotal, position) => runningTotal + (position.supplied?.usdValue ?? 0), 0) ?? 0
+                  )} supplied</span>
+                  <span>{formatUsd(
+                    portfolio?.positions
+                      .filter((position) => position.protocolName === protocol.name)
+                      .reduce((runningTotal, position) => runningTotal + (position.borrowed?.usdValue ?? 0), 0) ?? 0
+                  )} borrowed</span>
                 </div>
               </div>
             ))}
