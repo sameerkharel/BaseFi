@@ -5,6 +5,24 @@ import { useAccount, useConnect, useDisconnect } from "wagmi";
 
 import { normalizeAddress } from "../lib/address";
 
+const protocolCards = [
+  {
+    name: "Aave v3",
+    status: "Lending",
+    summary: "Supply and borrow balances",
+  },
+  {
+    name: "Moonwell",
+    status: "Lending",
+    summary: "Base-native market exposure",
+  },
+  {
+    name: "Aerodrome",
+    status: "LP + staking",
+    summary: "Liquidity and gauge rewards",
+  },
+];
+
 export default function HomePage() {
   const { address, isConnected } = useAccount();
   const { connect, connectors, isPending } = useConnect();
@@ -23,48 +41,123 @@ export default function HomePage() {
   }
 
   return (
-    <main>
-      <section>
-        <h1>BaseFi</h1>
-        <p>Read-only dashboard for Base DeFi positions, yields, and rewards.</p>
-
+    <main className="dashboard-shell">
+      <section className="hero-panel">
         <div>
-          {isConnected ? (
-            <>
-              <p>Connected wallet: {address}</p>
-              <button type="button" onClick={() => disconnect()}>
-                Disconnect
+          <p className="eyebrow">Base portfolio dashboard</p>
+          <h1>Track lending, LP, staking, and rewards in one read-only view.</h1>
+          <p className="hero-copy">
+            Connect a wallet or paste an address to inspect your Base DeFi footprint and compare yields across the
+            main protocols.
+          </p>
+        </div>
+
+        <div className="entry-card">
+          <div className="entry-actions">
+            {isConnected ? (
+              <>
+                <div>
+                  <span className="entry-label">Connected wallet</span>
+                  <strong>{address}</strong>
+                </div>
+                <button type="button" className="secondary-button" onClick={() => disconnect()}>
+                  Disconnect
+                </button>
+              </>
+            ) : (
+              <button
+                type="button"
+                className="primary-button"
+                onClick={() => connect({ connector: connectors[0] })}
+                disabled={isPending || connectors.length === 0}
+              >
+                Connect wallet
               </button>
-            </>
-          ) : (
-            <button
-              type="button"
-              onClick={() => connect({ connector: connectors[0] })}
-              disabled={isPending || connectors.length === 0}
-            >
-              Connect wallet
-            </button>
-          )}
-        </div>
+            )}
+          </div>
 
-        <div>
-          <label htmlFor="watch-address">Watch mode address</label>
-          <input
-            id="watch-address"
-            value={watchInput}
-            onChange={(event) => setWatchInput(event.target.value)}
-            placeholder="0x..."
-          />
-          <button type="button" onClick={applyWatchAddress}>
-            View address
-          </button>
-        </div>
+          <div className="watch-form">
+            <label htmlFor="watch-address">Watch mode address</label>
+            <div className="watch-input-row">
+              <input
+                id="watch-address"
+                value={watchInput}
+                onChange={(event) => setWatchInput(event.target.value)}
+                placeholder="0x..."
+              />
+              <button type="button" className="secondary-button" onClick={applyWatchAddress}>
+                View
+              </button>
+            </div>
+          </div>
 
-        {activeAddress ? (
-          <p>Active portfolio: {activeAddress}</p>
-        ) : (
-          <p>Connect a wallet or paste an address to begin.</p>
-        )}
+          <p className="active-address">
+            {activeAddress ? activeAddress : "Connect a wallet or paste an address to begin."}
+          </p>
+        </div>
+      </section>
+
+      <section className="summary-grid">
+        <article className="summary-card">
+          <span>Total portfolio value</span>
+          <strong>$0.00</strong>
+          <p>Aggregated across supported Base protocols.</p>
+        </article>
+        <article className="summary-card">
+          <span>Unclaimed rewards</span>
+          <strong>$0.00</strong>
+          <p>Claimable incentives and emissions.</p>
+        </article>
+        <article className="summary-card">
+          <span>Average net APY</span>
+          <strong>--</strong>
+          <p>Base yield plus rewards, separated by source.</p>
+        </article>
+      </section>
+
+      <section className="content-grid">
+        <article className="panel">
+          <div className="panel-header">
+            <h2>Protocol breakdown</h2>
+            <span>Positions and exposure</span>
+          </div>
+          <div className="protocol-list">
+            {protocolCards.map((protocol) => (
+              <div className="protocol-card" key={protocol.name}>
+                <div>
+                  <strong>{protocol.name}</strong>
+                  <span>{protocol.status}</span>
+                </div>
+                <p>{protocol.summary}</p>
+                <div className="protocol-metrics">
+                  <span>$0.00 supplied</span>
+                  <span>$0.00 borrowed</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </article>
+
+        <article className="panel">
+          <div className="panel-header">
+            <h2>Yield comparison</h2>
+            <span>Idle capital opportunities</span>
+          </div>
+          <div className="comparison-table">
+            <div>
+              <strong>USDC</strong>
+              <span>Aave: --</span>
+              <span>Moonwell: --</span>
+              <span>Morpho: --</span>
+            </div>
+            <div>
+              <strong>ETH</strong>
+              <span>Aave: --</span>
+              <span>Moonwell: --</span>
+              <span>Aerodrome: --</span>
+            </div>
+          </div>
+        </article>
       </section>
     </main>
   );
