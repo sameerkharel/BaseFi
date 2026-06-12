@@ -1,0 +1,10 @@
+{
+  "name": "@basefi/web",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit"
+  }
+}
