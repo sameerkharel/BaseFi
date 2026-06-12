@@ -14,16 +14,19 @@ import { usePortfolioSnapshot } from "../lib/portfolio";
 
 const protocolCards = [
   {
+    id: "aave-v3-base",
     name: "Aave v3",
     status: "Lending",
     summary: "Supply and borrow balances",
   },
   {
+    id: "moonwell-base",
     name: "Moonwell",
     status: "Lending",
     summary: "Base-native market exposure",
   },
   {
+    id: "aerodrome-base",
     name: "Aerodrome",
     status: "LP + staking",
     summary: "Liquidity and gauge rewards",
@@ -58,7 +61,11 @@ export default function HomePage() {
   const [watchedAddress, setWatchedAddress] = useState<string | null>(null);
 
   const activeAddress = address ?? watchedAddress;
-  const { data: portfolio } = usePortfolioSnapshot(activeAddress ?? undefined);
+  const {
+    data: portfolio,
+    isFetching: isPortfolioFetching,
+    isLoading: isPortfolioLoading,
+  } = usePortfolioSnapshot(activeAddress ?? undefined);
 
   function applyWatchAddress() {
     const normalized = normalizeAddress(watchInput);
@@ -144,6 +151,8 @@ export default function HomePage() {
         </article>
       </section>
 
+      {isPortfolioFetching ? <section className="loading-strip">Refreshing portfolio snapshot...</section> : null}
+
       {portfolio?.warnings.length ? (
         <section className="warning-panel">
           <strong>Partial data loaded</strong>
@@ -155,16 +164,30 @@ export default function HomePage() {
         <article className="panel">
           <div className="panel-header">
             <h2>Protocol breakdown</h2>
-            <span>Positions and exposure</span>
+            <span>{isPortfolioLoading ? "Loading positions" : "Positions and exposure"}</span>
           </div>
+          {!activeAddress ? (
+            <div className="empty-panel">Connect a wallet or paste an address to load protocol data.</div>
+          ) : null}
           <div className="protocol-list">
             {protocolCards.map((protocol) => (
-              <div className="protocol-card" key={protocol.name}>
+              <div className="protocol-card" key={protocol.id}>
                 <div>
                   <strong>{protocol.name}</strong>
                   <span>{protocol.status}</span>
                 </div>
                 <p>{protocol.summary}</p>
+                <div className="protocol-meta">
+                  <span>
+                    {portfolio?.positions.filter((position) => position.protocolId === protocol.id).length ?? 0} active
+                    positions
+                  </span>
+                  <span>
+                    {formatPercent(
+                      portfolio?.yields.find((yieldQuote) => yieldQuote.protocolId === protocol.id)?.supplyApy ?? null,
+                    )} supply APY
+                  </span>
+                </div>
                 <div className="protocol-metrics">
                   <span>{formatUsd(getProtocolUsdTotal(portfolio?.positions, protocol.name, "supplied"))} supplied</span>
                   <span>{formatUsd(getProtocolUsdTotal(portfolio?.positions, protocol.name, "borrowed"))} borrowed</span>

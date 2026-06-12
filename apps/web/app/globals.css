@@ -179,6 +179,14 @@ input {
   color: rgba(255, 241, 220, 0.86);
 }
 
+.loading-strip,
+.empty-panel {
+  border-radius: 18px;
+  padding: 14px 16px;
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(232, 243, 255, 0.82);
+}
+
 .summary-card {
   flex: 1;
   flex-direction: column;
@@ -214,6 +222,19 @@ input {
   padding: 16px;
   display: grid;
   gap: 10px;
+}
+
+.protocol-meta {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.protocol-meta span {
+  padding: 8px 10px;
+  border-radius: 999px;
+  background: rgba(127, 198, 255, 0.11);
+  color: rgba(232, 243, 255, 0.86);
 }
 
 .protocol-card p,
