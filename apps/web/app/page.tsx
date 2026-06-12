@@ -4,8 +4,12 @@ import { useState } from "react";
 import { useAccount, useConnect, useDisconnect } from "wagmi";
 
 import { normalizeAddress } from "../lib/address";
-import { formatPercent, formatUsd } from "../../../packages/shared/src";
-import { getYieldComparisonRows } from "../../../packages/shared/src";
+import {
+  formatPercent,
+  formatRelativeMinutes,
+  formatUsd,
+  getYieldComparisonRows,
+} from "../../../packages/shared/src";
 import { usePortfolioSnapshot } from "../lib/portfolio";
 
 const protocolCards = [
@@ -108,6 +112,7 @@ export default function HomePage() {
           <span>Total portfolio value</span>
           <strong>{formatUsd(portfolio?.totalUsdValue ?? 0)}</strong>
           <p>Aggregated across supported Base protocols.</p>
+          <small>{portfolio ? formatRelativeMinutes(portfolio.updatedAt) : "waiting for snapshot"}</small>
         </article>
         <article className="summary-card">
           <span>Unclaimed rewards</span>
