@@ -9,6 +9,7 @@ export const moonwellAdapter: ProtocolAdapter = {
     id: "moonwell-base",
     name: "Moonwell",
     chainId: 8453,
+    supportedChainIds: [8453],
     category: "lending",
     website: "https://moonwell.fi",
     docsUrl: "https://docs.moonwell.fi/",

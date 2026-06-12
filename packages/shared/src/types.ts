@@ -59,5 +59,6 @@ export interface PortfolioSnapshot {
   yields: YieldQuote[];
   totalUsdValue: number;
   totalRewardsUsd: number;
+  warnings: string[];
   updatedAt: string;
 }

@@ -9,6 +9,7 @@ export const aaveV3Adapter: ProtocolAdapter = {
     id: "aave-v3-base",
     name: "Aave v3",
     chainId: 8453,
+    supportedChainIds: [8453],
     category: "lending",
     website: "https://aave.com",
     docsUrl: "https://docs.aave.com/",

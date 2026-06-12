@@ -9,6 +9,7 @@ export const aerodromeAdapter: ProtocolAdapter = {
     id: "aerodrome-base",
     name: "Aerodrome",
     chainId: 8453,
+    supportedChainIds: [8453],
     category: "amm",
     website: "https://aerodrome.finance",
     docsUrl: "https://docs.aerodrome.finance/",

@@ -8,6 +8,7 @@ export interface ProtocolMetadata {
   id: string;
   name: string;
   chainId: number;
+  supportedChainIds: number[];
   category: "lending" | "amm" | "staking" | "vault";
   website?: string;
   subgraphUrl?: string;
@@ -30,8 +31,8 @@ export interface ProtocolAdapter {
 }
 
 export interface AdapterRegistry {
-  list(): ProtocolMetadata[];
-  get(protocolId: string): ProtocolAdapter | undefined;
+  list(chainId?: number): ProtocolMetadata[];
+  get(protocolId: string, chainId?: number): ProtocolAdapter | undefined;
 }
 
 export type SnapshotBuilder = (input: {

@@ -23,19 +23,43 @@ export async function buildPortfolioSnapshot({
   chainId,
   adapters,
 }: SnapshotInput): Promise<PortfolioSnapshot> {
-  const results = await Promise.all(
-    adapters.map(async (adapter) => {
+  const supportedAdapters = adapters.filter((adapter) =>
+    adapter.metadata.supportedChainIds.includes(chainId),
+  );
+
+  const settledResults = await Promise.allSettled(
+    supportedAdapters.map(async (adapter) => {
       const [positions, yields] = await Promise.all([
         adapter.getPositions({ address, chainId }),
         adapter.getYields({ chainId }),
       ]);
 
-      return { positions, yields };
+      return {
+        adapter,
+        positions,
+        yields,
+      };
     }),
   );
 
-  const positions = results.flatMap((result) => result.positions);
-  const yields = results.flatMap((result) => result.yields);
+  const warnings = settledResults.flatMap((result) => {
+    if (result.status === "fulfilled") {
+      return [];
+    }
+
+    return [result.reason instanceof Error ? result.reason.message : "Failed to load a protocol adapter"];
+  });
+
+  const fulfilledResults = settledResults.flatMap((result) => {
+    if (result.status !== "fulfilled") {
+      return [];
+    }
+
+    return [result.value];
+  });
+
+  const positions = fulfilledResults.flatMap((result) => result.positions);
+  const yields = fulfilledResults.flatMap((result) => result.yields);
   const totalUsdValue = positions.reduce((runningTotal, position) => {
     return runningTotal + (position.usdValue ?? 0);
   }, 0);
@@ -48,6 +72,7 @@ export async function buildPortfolioSnapshot({
     yields,
     totalUsdValue,
     totalRewardsUsd,
+    warnings,
     updatedAt: new Date().toISOString(),
   };
 }

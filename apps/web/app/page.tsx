@@ -32,6 +32,24 @@ const protocolCards = [
 
 const comparisonAssets = ["USDC", "ETH"];
 
+function getProtocolUsdTotal(
+  portfolioPositions:
+    | {
+        protocolName: string;
+        supplied?: { usdValue?: number };
+        borrowed?: { usdValue?: number };
+      }[]
+    | undefined,
+  protocolName: string,
+  key: "supplied" | "borrowed",
+) {
+  return portfolioPositions?.
+    filter((position) => position.protocolName === protocolName)
+    .reduce((runningTotal, position) => {
+      return runningTotal + (position[key]?.usdValue ?? 0);
+    }, 0) ?? 0;
+}
+
 export default function HomePage() {
   const { address, isConnected } = useAccount();
   const { connect, connectors, isPending } = useConnect();
@@ -126,6 +144,13 @@ export default function HomePage() {
         </article>
       </section>
 
+      {portfolio?.warnings.length ? (
+        <section className="warning-panel">
+          <strong>Partial data loaded</strong>
+          <p>{portfolio.warnings.join(" ")}</p>
+        </section>
+      ) : null}
+
       <section className="content-grid">
         <article className="panel">
           <div className="panel-header">
@@ -141,16 +166,8 @@ export default function HomePage() {
                 </div>
                 <p>{protocol.summary}</p>
                 <div className="protocol-metrics">
-                  <span>{formatUsd(
-                    portfolio?.positions
-                      .filter((position) => position.protocolName === protocol.name)
-                      .reduce((runningTotal, position) => runningTotal + (position.supplied?.usdValue ?? 0), 0) ?? 0
-                  )} supplied</span>
-                  <span>{formatUsd(
-                    portfolio?.positions
-                      .filter((position) => position.protocolName === protocol.name)
-                      .reduce((runningTotal, position) => runningTotal + (position.borrowed?.usdValue ?? 0), 0) ?? 0
-                  )} borrowed</span>
+                  <span>{formatUsd(getProtocolUsdTotal(portfolio?.positions, protocol.name, "supplied"))} supplied</span>
+                  <span>{formatUsd(getProtocolUsdTotal(portfolio?.positions, protocol.name, "borrowed"))} borrowed</span>
                 </div>
               </div>
             ))}

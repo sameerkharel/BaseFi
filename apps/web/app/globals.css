@@ -161,6 +161,24 @@ input {
   align-items: stretch;
 }
 
+.warning-panel {
+  border-radius: 20px;
+  border: 1px solid rgba(255, 192, 113, 0.2);
+  background: rgba(80, 52, 0, 0.34);
+  padding: 18px 20px;
+  display: grid;
+  gap: 8px;
+}
+
+.warning-panel strong {
+  color: #ffd18a;
+}
+
+.warning-panel p {
+  margin: 0;
+  color: rgba(255, 241, 220, 0.86);
+}
+
 .summary-card {
   flex: 1;
   flex-direction: column;
